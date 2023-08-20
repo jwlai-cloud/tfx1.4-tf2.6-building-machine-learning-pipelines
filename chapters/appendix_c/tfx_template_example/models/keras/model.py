@@ -74,7 +74,7 @@ def _input_fn(file_pattern, tf_transform_output, batch_size=200):
         tf_transform_output.transformed_feature_spec().copy()
     )
 
-    dataset = tf.data.experimental.make_batched_features_dataset(
+    return tf.data.experimental.make_batched_features_dataset(
         file_pattern=file_pattern,
         batch_size=batch_size,
         features=transformed_feature_spec,
@@ -82,40 +82,27 @@ def _input_fn(file_pattern, tf_transform_output, batch_size=200):
         label_key=features.transformed_name(features.LABEL_KEY),
     )
 
-    return dataset
-
 
 def get_model(show_summary: bool = True) -> tf.keras.models.Model:
     """
     This function defines a Keras model and returns the model as a Keras object.
     """
 
-    # one-hot categorical features
-    input_features = []
-    for key, dim in features.ONE_HOT_FEATURES.items():
-        input_features.append(
-            tf.keras.Input(
-                shape=(dim + 1,), name=features.transformed_name(key)
-            )
-        )
-
+    input_features = [
+        tf.keras.Input(shape=(dim + 1,), name=features.transformed_name(key))
+        for key, dim in features.ONE_HOT_FEATURES.items()
+    ]
     # adding bucketized features
-    for key, dim in features.BUCKET_FEATURES.items():
-        input_features.append(
-            tf.keras.Input(
-                shape=(dim + 1,), name=features.transformed_name(key)
-            )
+    input_features.extend(
+        tf.keras.Input(shape=(dim + 1,), name=features.transformed_name(key))
+        for key, dim in features.BUCKET_FEATURES.items()
+    )
+    input_texts = [
+        tf.keras.Input(
+            shape=(1,), name=features.transformed_name(key), dtype=tf.string
         )
-
-    # adding text input features
-    input_texts = []
-    for key in features.TEXT_FEATURES.keys():
-        input_texts.append(
-            tf.keras.Input(
-                shape=(1,), name=features.transformed_name(key), dtype=tf.string
-            )
-        )
-
+        for key in features.TEXT_FEATURES.keys()
+    ]
     # embed text features
     MODULE_URL = "https://tfhub.dev/google/universal-sentence-encoder/4"
     embed = hub.KerasLayer(MODULE_URL)

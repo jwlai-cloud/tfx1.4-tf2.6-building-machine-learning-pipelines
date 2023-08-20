@@ -33,7 +33,7 @@ def init_beam_pipeline(
         "--direct_running_mode=multi_processing",
     )
 
-    p = pipeline.Pipeline(
+    return pipeline.Pipeline(
         pipeline_name=pipeline_name,
         pipeline_root=pipeline_root,
         components=components,
@@ -43,7 +43,6 @@ def init_beam_pipeline(
         ),
         beam_pipeline_args=beam_arg,
     )
-    return p
 
 
 if __name__ == "__main__":
@@ -65,6 +64,6 @@ if __name__ == "__main__":
         serving_model_dir=serving_model_dir,
     )
     direct_num_workers = int(os.cpu_count() / 2)
-    direct_num_workers = 1 if direct_num_workers < 1 else direct_num_workers
+    direct_num_workers = max(direct_num_workers, 1)
     pipeline = init_beam_pipeline(components, pipeline_root, direct_num_workers)
     BeamDagRunner().run(pipeline)

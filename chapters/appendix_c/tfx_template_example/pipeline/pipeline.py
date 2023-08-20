@@ -71,12 +71,9 @@ def create_pipeline(
 ) -> pipeline.Pipeline:
     """Implements the complaint prediction pipeline with TFX."""
 
-    components = []
-
     # Brings data into the pipeline or otherwise joins/converts training data.
     example_gen = CsvExampleGen(input=external_input(data_path))
-    components.append(example_gen)
-
+    components = [example_gen]
     # Computes statistics over data for visualization and example validation.
     statistics_gen = StatisticsGen(examples=example_gen.outputs["examples"])
     components.append(statistics_gen)
@@ -116,16 +113,14 @@ def create_pipeline(
         ),
     }
     if ai_platform_training_args is not None:
-        trainer_args.update(
-            {
-                "custom_executor_spec": executor_spec.ExecutorClassSpec(
-                    ai_platform_trainer_executor.GenericExecutor
-                ),
-                "custom_config": {
-                    ai_platform_trainer_executor.TRAINING_ARGS_KEY: ai_platform_training_args,  # noqa
-                },
-            }
-        )
+        trainer_args |= {
+            "custom_executor_spec": executor_spec.ExecutorClassSpec(
+                ai_platform_trainer_executor.GenericExecutor
+            ),
+            "custom_config": {
+                ai_platform_trainer_executor.TRAINING_ARGS_KEY: ai_platform_training_args,  # noqa
+            },
+        }
     trainer = Trainer(**trainer_args)
     components.append(trainer)
 
@@ -183,16 +178,14 @@ def create_pipeline(
         ),
     }
     if ai_platform_serving_args is not None:
-        pusher_args.update(
-            {
-                "custom_executor_spec": executor_spec.ExecutorClassSpec(
-                    ai_platform_pusher_executor.Executor
-                ),
-                "custom_config": {
-                    ai_platform_pusher_executor.SERVING_ARGS_KEY: ai_platform_serving_args  # noqa
-                },
-            }
-        )
+        pusher_args |= {
+            "custom_executor_spec": executor_spec.ExecutorClassSpec(
+                ai_platform_pusher_executor.Executor
+            ),
+            "custom_config": {
+                ai_platform_pusher_executor.SERVING_ARGS_KEY: ai_platform_serving_args  # noqa
+            },
+        }
     pusher = Pusher(**pusher_args)  # pylint: disable=unused-variable
     components.append(pusher)
 

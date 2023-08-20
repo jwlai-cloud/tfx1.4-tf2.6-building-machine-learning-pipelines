@@ -22,7 +22,7 @@ LABEL_KEY = "consumer_disputed"
 
 
 def transformed_name(key):
-    return key + "_xf"
+    return f"{key}_xf"
 
 
 def fill_in_missing(x: Union[tf.Tensor, tf.SparseTensor]) -> tf.Tensor:

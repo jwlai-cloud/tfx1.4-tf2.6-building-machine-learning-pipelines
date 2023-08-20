@@ -41,13 +41,12 @@ def init_kubeflow_pipeline(
         f"--direct_num_workers={direct_num_workers}",
         "--direct_running_mode=multi_processing",
     )
-    p = pipeline.Pipeline(
+    return pipeline.Pipeline(
         pipeline_name=pipeline_name,
         pipeline_root=pipeline_root,
         components=components,
         beam_pipeline_args=beam_arg,
     )
-    return p
 
 
 if __name__ == "__main__":

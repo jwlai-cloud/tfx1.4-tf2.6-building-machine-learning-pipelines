@@ -19,28 +19,19 @@ def get_model(show_summary=True):
     Keras object.
     """
 
-    # one-hot categorical features
-    input_features = []
-    for key, dim in ONE_HOT_FEATURES.items():
-        input_features.append(
-            tf.keras.Input(shape=(dim + 1,), name=transformed_name(key))
-        )
-
+    input_features = [
+        tf.keras.Input(shape=(dim + 1,), name=transformed_name(key))
+        for key, dim in ONE_HOT_FEATURES.items()
+    ]
     # adding bucketized features
-    for key, dim in BUCKET_FEATURES.items():
-        input_features.append(
-            tf.keras.Input(shape=(dim + 1,), name=transformed_name(key))
-        )
-
-    # adding text input features
-    input_texts = []
-    for key in TEXT_FEATURES.keys():
-        input_texts.append(
-            tf.keras.Input(
-                shape=(1,), name=transformed_name(key), dtype=tf.string
-            )
-        )
-
+    input_features.extend(
+        tf.keras.Input(shape=(dim + 1,), name=transformed_name(key))
+        for key, dim in BUCKET_FEATURES.items()
+    )
+    input_texts = [
+        tf.keras.Input(shape=(1,), name=transformed_name(key), dtype=tf.string)
+        for key in TEXT_FEATURES.keys()
+    ]
     # embed text features
     MODULE_URL = "https://tfhub.dev/google/universal-sentence-encoder/4"
     embed = hub.KerasLayer(MODULE_URL)
@@ -123,15 +114,13 @@ def _input_fn(file_pattern, tf_transform_output, batch_size=64):
         tf_transform_output.transformed_feature_spec().copy()
     )
 
-    dataset = tf.data.experimental.make_batched_features_dataset(
+    return tf.data.experimental.make_batched_features_dataset(
         file_pattern=file_pattern,
         batch_size=batch_size,
         features=transformed_feature_spec,
         reader=_gzip_reader_fn,
         label_key=transformed_name(LABEL_KEY),
     )
-
-    return dataset
 
 
 # TFX Trainer will call this function.

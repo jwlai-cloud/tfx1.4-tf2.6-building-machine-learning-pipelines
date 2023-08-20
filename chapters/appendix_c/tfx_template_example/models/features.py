@@ -47,12 +47,12 @@ LABEL_KEY = "consumer_disputed"
 
 def transformed_name(key: Text) -> Text:
     """Generate the name of the transformed feature from original name."""
-    return key + "_xf"
+    return f"{key}_xf"
 
 
 def vocabulary_name(key: Text) -> Text:
     """Generate the name of the vocabulary feature from original name."""
-    return key + "_vocab"
+    return f"{key}_vocab"
 
 
 def transformed_names(keys: List[Text]) -> List[Text]:

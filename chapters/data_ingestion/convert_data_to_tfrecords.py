@@ -24,8 +24,7 @@ def clean_rows(row):
 def convert_zipcode_to_int(zipcode):
     if isinstance(zipcode, str) and "XX" in zipcode:
         zipcode = zipcode.replace("XX", "00")
-    int_zipcode = int(zipcode)
-    return int_zipcode
+    return int(zipcode)
 
 
 original_data_file = "../../data/consumer_complaints_with_narrative.csv"
