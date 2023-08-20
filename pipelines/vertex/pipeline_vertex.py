@@ -43,7 +43,7 @@ vertex_training_args = {
             },
             "replica_count": 1,
             "container_spec": {
-                "image_uri": "gcr.io/tfx-oss-public/tfx:{}".format(tfx.__version__),
+                "image_uri": f"gcr.io/tfx-oss-public/tfx:{tfx.__version__}"
             },
         }
     ],
@@ -84,9 +84,9 @@ vertex_serving_args = {
 beam_pipeline_args = [
     "--runner=DataflowRunner",
     "--experiments=shuffle_mode=auto",
-    "--project=" + project_id,
+    f"--project={project_id}",
     "--temp_location=" + os.path.join(output_bucket, "tmp"),
-    "--region=" + gcp_region,
+    f"--region={gcp_region}",
     "--disk_size_gb=50",
     "--machine_type=e2-standard-8",
     "--experiments=use_runner_v2",

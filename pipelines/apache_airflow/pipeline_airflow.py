@@ -33,7 +33,7 @@ def init_pipeline(
         "--direct_running_mode=multi_processing",
     )
 
-    p = pipeline.Pipeline(
+    return pipeline.Pipeline(
         pipeline_name=pipeline_name,
         pipeline_root=pipeline_root,
         components=components,
@@ -43,7 +43,6 @@ def init_pipeline(
         ),
         beam_pipeline_args=beam_arg,
     )
-    return p
 
 
 components = init_components(

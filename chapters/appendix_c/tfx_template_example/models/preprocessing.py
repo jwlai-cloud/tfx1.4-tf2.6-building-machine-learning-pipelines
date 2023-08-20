@@ -75,7 +75,7 @@ def convert_zip_code(zipcode: str) -> tf.float32:
     Returns:
         zipcode: int64
     """
-    if zipcode == "":
+    if not zipcode:
         zipcode = "00000"
     zipcode = tf.strings.regex_replace(zipcode, r"X{0,5}", "0")
     zipcode = tf.strings.to_number(zipcode, out_type=tf.float32)

@@ -68,7 +68,7 @@ def init_components(
     }
 
     if vertex_training_custom_config:
-        training_kwargs.update({"custom_config": vertex_training_custom_config})
+        training_kwargs["custom_config"] = vertex_training_custom_config
         trainer = tfx.extensions.google_cloud_ai_platform.Trainer(**training_kwargs)
     else:
         trainer = tfx.components.Trainer(**training_kwargs)
